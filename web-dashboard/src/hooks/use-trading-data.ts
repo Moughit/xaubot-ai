@@ -3,9 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { TradingStatus } from "@/types/trading";
 
-// Set NEXT_PUBLIC_API_URL in Vercel after deploying the API separately.
-const API_URL = (process.env.NEXT_PUBLIC_API_URL || "").trim().replace(/\/$/, "");
-const POLL_INTERVAL_MS = 5000;
+const POLL_INTERVAL_MS = 10000;
 
 export function useTradingData() {
   const [data, setData] = useState<TradingStatus | null>(null);
@@ -14,23 +12,15 @@ export function useTradingData() {
   const [lastFetch, setLastFetch] = useState<Date | null>(null);
 
   const fetchData = useCallback(async () => {
-    if (!API_URL) {
-      setError("API address is not configured. Deploy the backend, then add NEXT_PUBLIC_API_URL in Vercel.");
-      setLoading(false);
-      return;
-    }
-
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 10000);
-
     try {
-      const res = await fetch(`${API_URL}/api/status`, {
+      const res = await fetch("/api/status", {
         cache: "no-store",
         signal: controller.signal,
         headers: { Accept: "application/json" },
       });
-      if (!res.ok) throw new Error(`API returned HTTP ${res.status}`);
-
+      if (!res.ok) throw new Error(`Dashboard API returned HTTP ${res.status}`);
       const json = (await res.json()) as TradingStatus;
       setData(json);
       setError(null);
@@ -38,10 +28,10 @@ export function useTradingData() {
     } catch (err) {
       setError(
         err instanceof DOMException && err.name === "AbortError"
-          ? "The API did not respond within 10 seconds."
+          ? "The dashboard status service timed out."
           : err instanceof Error
             ? err.message
-            : "Unable to reach the API server."
+            : "Unable to load dashboard status."
       );
     } finally {
       window.clearTimeout(timeout);
@@ -56,5 +46,5 @@ export function useTradingData() {
   }, [fetchData]);
 
   const dataAge = lastFetch ? (Date.now() - lastFetch.getTime()) / 1000 : 999;
-  return { data, loading, error, dataAge, refetch: fetchData, apiConfigured: Boolean(API_URL) };
+  return { data, loading, error, dataAge, refetch: fetchData, apiConfigured: true };
 }
