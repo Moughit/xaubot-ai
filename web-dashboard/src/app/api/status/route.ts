@@ -35,6 +35,7 @@ export async function GET() {
     spread: 0,
     priceChange: 0,
     priceHistory: [] as number[],
+    priceTimestamps: [] as string[],
     balance: 0,
     equity: 0,
     profit: 0,
@@ -96,6 +97,7 @@ export async function GET() {
     const candles = result.values
       .map((candle) => ({
         time: candle.datetime,
+        timestamp: new Date(candle.datetime.replace(" ", "T") + "Z").toISOString(),
         close: Number(candle.close),
       }))
       .filter((candle) => Number.isFinite(candle.close) && candle.close > 0)
@@ -118,6 +120,7 @@ export async function GET() {
         price: latest,
         priceChange: change,
         priceHistory: prices,
+        priceTimestamps: candles.map((candle) => candle.timestamp),
         logs: [{
           time: now,
           level: "info",
