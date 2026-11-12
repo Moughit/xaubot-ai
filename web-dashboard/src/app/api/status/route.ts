@@ -32,8 +32,6 @@ export async function GET() {
     symbol: "XAU/USD",
     interval: "1min",
     price: 0,
-    priceSource: "unavailable",
-    quoteRetrievedAt: null as string | null,
     spread: 0,
     priceChange: 0,
     priceHistory: [] as number[],
@@ -109,34 +107,8 @@ export async function GET() {
       throw new Error("The provider returned no valid XAU/USD candles.");
     }
 
-
-    // /price returns the provider's latest available quote. The one-minute
-    // candle close remains the historical series value and may be older.
-    let latestQuote: number | null = null;
-    let quoteRetrievedAt: string | null = null;
-    try {
-      const quoteUrl = new URL("https://api.twelvedata.com/price");
-      quoteUrl.searchParams.set("symbol", "XAU/USD");
-      const quoteResponse = await fetch(quoteUrl.toString(), {
-        headers: { Authorization: `apikey ${apiKey}`, Accept: "application/json" },
-        cache: "no-store",
-        signal: AbortSignal.timeout(5000),
-      });
-      if (quoteResponse.ok) {
-        const quote = await quoteResponse.json() as { price?: string; status?: string; message?: string };
-        const parsedQuote = Number(quote.price);
-        if (quote.status !== "error" && Number.isFinite(parsedQuote) && parsedQuote > 0) {
-          latestQuote = parsedQuote;
-          quoteRetrievedAt = new Date().toISOString();
-        }
-      }
-    } catch {
-      // Keep the verified last candle close as an explicitly labelled fallback.
-    }
-
     const prices = candles.map((candle) => candle.close);
-    const candleClose = prices[prices.length - 1];
-    const latest = latestQuote ?? candleClose;
+    const latest = prices[prices.length - 1];
     const previous = prices.length > 1 ? prices[prices.length - 2] : latest;
     const change = latest - (prices[0] ?? latest);
 
@@ -146,8 +118,6 @@ export async function GET() {
         connected: true,
         timestamp: now,
         price: latest,
-        priceSource: latestQuote !== null ? "Twelve Data latest-price endpoint" : "Last one-minute candle close (fallback)",
-        quoteRetrievedAt,
         priceChange: change,
         priceHistory: prices,
         priceTimestamps: candles.map((candle) => candle.timestamp),
@@ -163,7 +133,6 @@ export async function GET() {
           latestCandleTime: candles[candles.length - 1].time,
           previousClose: previous,
           candleCount: candles.length,
-          latestQuoteRetrievedAt: quoteRetrievedAt,
         },
       },
       { headers: noStore }
