@@ -71,7 +71,7 @@ export interface H1BiasDetails {
 
 export interface TradingStatus {
   timestamp: string;
-  connected: boolean;
+  connected: boolean;\n  dataSource?: string;\n  symbol?: string;\n  marketData?: { provider: string; symbol: string; interval: string; latestCandleTime: string; previousClose: number; candleCount: number };\n  marketDataError?: string;
 
   // Price
   price: number;
