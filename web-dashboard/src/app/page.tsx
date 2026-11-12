@@ -214,7 +214,7 @@ export default function Dashboard() {
           {/* Row 3: Charts */}
           <div className="grid grid-cols-1 gap-2 md:flex-[1.6] md:min-h-0 md:grid md:grid-cols-5 md:gap-1.5">
             <div className={cn("stagger-enter min-h-[300px] md:col-span-3 md:min-h-0", visible[9] && "visible")}>
-              <PriceChart data={data.priceHistory} />
+              <PriceChart data={data.priceHistory} timestamps={data.priceTimestamps} />
             </div>
             <div className={cn("stagger-enter min-h-[240px] md:col-span-2 md:min-h-0", visible[10] && "visible")}>
               <AssistantCard data={data} />
