@@ -49,25 +49,39 @@ function LoadingSkeleton() {
   );
 }
 
-function ErrorDisplay({ message }: { message: string }) {
+function ErrorDisplay({ message, apiConfigured, onRetry }: { message: string; apiConfigured: boolean; onRetry: () => void }) {
   return (
-    <div className="flex-1 flex items-center justify-center">
-      <div className="text-center space-y-4">
-        <div className="w-14 h-14 rounded-full bg-danger-bg mx-auto flex items-center justify-center">
-          <span className="text-danger text-2xl font-bold">!</span>
+    <main className="flex-1 min-h-0 overflow-y-auto px-4 py-8 sm:px-6">
+      <section className="mx-auto flex min-h-full w-full max-w-2xl items-center justify-center">
+        <div className="glass w-full rounded-3xl p-6 text-center shadow-2xl sm:p-9">
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-danger/20 bg-danger-bg">
+            <span className="text-3xl font-bold text-danger">!</span>
+          </div>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">System connection</p>
+          <h2 className="mb-3 text-2xl font-bold tracking-tight sm:text-3xl">Dashboard is offline</h2>
+          <p className="mx-auto max-w-lg break-words text-sm leading-6 text-muted-foreground">{message}</p>
+          <div className="my-6 rounded-2xl border border-border bg-surface-light p-4 text-left">
+            <p className="mb-2 text-sm font-semibold">{apiConfigured ? "Backend check" : "Setup required"}</p>
+            <ol className="list-decimal space-y-2 pl-5 text-sm leading-6 text-muted-foreground">
+              <li>Deploy the Python API as a separate web service.</li>
+              <li>Copy its public HTTPS service URL.</li>
+              <li>In Vercel, open Project Settings → Environment Variables.</li>
+              <li>Add <code className="rounded bg-surface px-1.5 py-0.5 text-foreground">NEXT_PUBLIC_API_URL</code> with that URL, then redeploy.</li>
+            </ol>
+          </div>
+          <div className="flex flex-col justify-center gap-3 sm:flex-row">
+            <button onClick={onRetry} className="rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90">Retry connection</button>
+            <a href="/books" className="rounded-xl border border-border px-5 py-3 text-sm font-semibold text-foreground transition hover:bg-surface-light">Open system documentation</a>
+          </div>
+          <p className="mt-5 text-xs text-muted-foreground">No live data is being displayed. Historical backtest results are not current market information.</p>
         </div>
-        <p className="text-danger text-lg font-semibold">Connection Error</p>
-        <p className="text-muted-foreground">{message}</p>
-        <p className="text-muted-foreground/60 text-sm">
-          Make sure the API server is running on port 8000
-        </p>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
 
 export default function Dashboard() {
-  const { data, loading, error, dataAge } = useTradingData();
+  const { data, loading, error, dataAge, refetch, apiConfigured } = useTradingData();
   const visible = useStaggerEntry(15, 40);
 
   const now = new Date();
@@ -92,7 +106,7 @@ export default function Dashboard() {
     return (
       <div className="h-screen flex flex-col overflow-hidden bg-background">
         <Header connected={false} lastUpdate={wibTime} dataAge={999} />
-        <ErrorDisplay message={error} />
+        <ErrorDisplay message={error} apiConfigured={apiConfigured} onRetry={() => void refetch()} />
       </div>
     );
   }
