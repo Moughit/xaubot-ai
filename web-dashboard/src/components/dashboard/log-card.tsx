@@ -56,14 +56,14 @@ export function LogCard({ logs }: LogCardProps) {
           ) : (
             <div className="space-y-2">
               {logs.map((log, i) => (
-                <div key={`${log.time}-${i}`} className="grid min-w-0 grid-cols-[auto_auto_minmax(0,1fr)] items-start gap-x-2 rounded-lg border-b border-border/40 pb-2 last:border-0">
-                  <time className="max-w-[7.5rem] break-all text-[10px] leading-5 text-muted-foreground sm:max-w-none sm:text-xs">
+                <div key={`${log.time}-${i}`} className="flex min-w-0 flex-col gap-1 rounded-lg border-b border-border/40 pb-2 last:border-0 sm:grid sm:grid-cols-[minmax(0,8rem)_auto_minmax(0,1fr)] sm:items-start sm:gap-x-2">
+                  <time className="max-w-full truncate text-[10px] leading-4 text-muted-foreground sm:max-w-[8rem] sm:text-xs">
                     {log.time || "—"}
                   </time>
-                  <span className={`pt-0.5 text-[10px] font-bold tracking-wide ${getLevelColor(log.level)}`}>
+                  <span className={`text-[10px] font-bold tracking-wide ${getLevelColor(log.level)}`}>
                     {getLevelBadge(log.level)}
                   </span>
-                  <span className="min-w-0 whitespace-pre-wrap break-words text-foreground/80">
+                  <span className="min-w-0 whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-foreground/80">
                     {log.message}
                   </span>
                 </div>
