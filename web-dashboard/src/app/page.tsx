@@ -242,7 +242,7 @@ export default function Dashboard() {
                 settings={data.settings}
               />
             </div>
-            <div className={cn("stagger-enter min-h-[170px] md:min-h-0 h-full", visible[14] && "visible")}>
+            <div className={cn("stagger-enter col-span-2 h-[260px] min-h-0 md:col-span-1 md:h-full", visible[14] && "visible")}>
               <LogCard logs={data.logs} />
             </div>
           </div>
