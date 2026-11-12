@@ -82,6 +82,7 @@ export interface TradingStatus {
   spread: number;
   priceChange: number;
   priceHistory: number[];
+  priceTimestamps: string[];
 
   // Account
   balance: number;
