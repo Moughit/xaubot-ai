@@ -7,6 +7,7 @@ import { TrendingUp, Radio } from "lucide-react";
 
 interface PriceChartProps {
   data: number[];
+  timestamps: string[];
 }
 
 function formatTime(date: Date): string {
@@ -18,23 +19,19 @@ function formatTime(date: Date): string {
   });
 }
 
-export function PriceChart({ data }: PriceChartProps) {
+export function PriceChart({ data, timestamps }: PriceChartProps) {
   const validData = useMemo(
     () => data.filter((price) => Number.isFinite(price) && price > 0),
     [data]
   );
 
   const chartData = useMemo(() => {
-    if (validData.length === 0) return [];
-    const now = Date.now();
-    const totalMs = 2 * 60 * 60 * 1000;
-    const step = validData.length > 1 ? totalMs / (validData.length - 1) : 0;
-
-    return validData.map((price, i) => {
-      const ts = new Date(now - totalMs + i * step);
-      return { time: formatTime(ts), timestamp: ts.getTime(), price };
+    return validData.flatMap((price, i) => {
+      const timestamp = Date.parse(timestamps[i] || "");
+      if (!Number.isFinite(timestamp)) return [];
+      return [{ time: formatTime(new Date(timestamp)), timestamp, price }];
     });
-  }, [validData]);
+  }, [validData, timestamps]);
 
   const tickIndices = useMemo(() => {
     if (chartData.length <= 6) return chartData.map((d) => d.timestamp);
