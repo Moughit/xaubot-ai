@@ -81,7 +81,7 @@ export function Header({ connected, lastUpdate, dataAge }: HeaderProps) {
 
           <Badge variant={connected ? "success" : "danger"} className="gap-1.5 text-sm h-6">
             {connected ? <Wifi className="h-3.5 w-3.5" /> : <WifiOff className="h-3.5 w-3.5" />}
-            {connected ? "MT5" : "OFF"}
+            {connected ? "DATA" : "NO DATA"}
           </Badge>
 
           <div className="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/40 dark:bg-white/[0.06] backdrop-blur-sm border border-white/30 dark:border-white/10 text-sm">
