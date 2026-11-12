@@ -23,8 +23,8 @@ const navLinks = [
 export function Header({ connected, lastUpdate, dataAge }: HeaderProps) {
   const getDataStatus = () => {
     if (dataAge > 45) return { label: "OFFLINE", variant: "danger" as const, dot: "bg-danger" };
-    if (dataAge > 15) return { label: `STALE ${dataAge.toFixed(0)}s`, variant: "warning" as const, dot: "bg-warning animate-pulse" };
-    return { label: `LIVE ${dataAge.toFixed(1)}s`, variant: "success" as const, dot: "bg-success" };
+    if (dataAge > 15) return { label: `API STALE ${dataAge.toFixed(0)}s`, variant: "warning" as const, dot: "bg-warning animate-pulse" };
+    return { label: `API ${dataAge.toFixed(1)}s`, variant: "success" as const, dot: "bg-success" };
   };
 
   const status = getDataStatus();
