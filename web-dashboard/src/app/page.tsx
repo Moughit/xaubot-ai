@@ -25,22 +25,22 @@ import { cn } from "@/lib/utils";
 
 function LoadingSkeleton() {
   return (
-    <div className="flex-1 min-h-0 flex flex-col gap-1.5 p-1.5">
-      <div className="flex-[1] min-h-0 grid grid-cols-4 gap-1.5">
+    <div className="flex-1 min-h-0 flex flex-col gap-1.5 p-1.5 overflow-y-auto md:overflow-hidden">
+      <div className="grid grid-cols-2 gap-2 md:flex-[1] md:min-h-0 md:grid-cols-4 md:gap-1.5">
         {[...Array(4)].map((_, i) => (
           <Skeleton key={i} className="rounded-lg" />
         ))}
       </div>
-      <div className="flex-[1] min-h-0 grid grid-cols-4 gap-1.5">
+      <div className="grid grid-cols-2 gap-2 md:flex-[1] md:min-h-0 md:grid-cols-4 md:gap-1.5">
         {[...Array(4)].map((_, i) => (
           <Skeleton key={i} className="rounded-lg" />
         ))}
       </div>
-      <div className="flex-[1.6] min-h-0 grid grid-cols-5 gap-1.5">
+      <div className="grid grid-cols-1 gap-2 md:flex-[1.6] md:min-h-0 md:grid md:grid-cols-5 md:gap-1.5">
         <Skeleton className="col-span-3 rounded-lg" />
         <Skeleton className="col-span-2 rounded-lg" />
       </div>
-      <div className="flex-[1.2] min-h-0 grid grid-cols-4 gap-1.5">
+      <div className="grid grid-cols-2 gap-2 md:flex-[1.2] md:min-h-0 md:grid-cols-4 md:gap-1.5">
         {[...Array(4)].map((_, i) => (
           <Skeleton key={i} className="rounded-lg" />
         ))}
@@ -95,7 +95,7 @@ export default function Dashboard() {
 
   if (loading && !data) {
     return (
-      <div className="h-screen flex flex-col overflow-hidden bg-background">
+      <div className="h-dvh flex flex-col overflow-hidden bg-background">
         <Header connected={false} lastUpdate={wibTime} dataAge={999} />
         <LoadingSkeleton />
       </div>
@@ -104,7 +104,7 @@ export default function Dashboard() {
 
   if (error && !data) {
     return (
-      <div className="h-screen flex flex-col overflow-hidden bg-background">
+      <div className="h-dvh flex flex-col overflow-hidden bg-background">
         <Header connected={false} lastUpdate={wibTime} dataAge={999} />
         <ErrorDisplay message={error} apiConfigured={apiConfigured} onRetry={() => void refetch()} />
       </div>
@@ -115,7 +115,7 @@ export default function Dashboard() {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="h-screen flex flex-col overflow-hidden bg-background">
+      <div className="h-dvh flex flex-col overflow-hidden bg-background">
         <Header
           connected={data.connected}
           lastUpdate={wibTime}
@@ -123,11 +123,11 @@ export default function Dashboard() {
         />
 
         {/* Main grid — fills remaining height, NO scroll */}
-        <main className="flex-1 min-h-0 flex flex-col gap-1.5 p-1.5">
+        <main className="flex-1 min-h-0 flex flex-col gap-2 p-2 overflow-y-auto md:overflow-hidden md:gap-1.5 md:p-1.5">
 
           {/* Row 1: Market Overview */}
-          <div className="flex-[1] min-h-0 grid grid-cols-4 gap-1.5">
-            <div className={cn("stagger-enter h-full", visible[0] && "visible")}>
+          <div className="grid grid-cols-2 gap-2 md:flex-[1] md:min-h-0 md:grid-cols-4 md:gap-1.5">
+            <div className={cn("stagger-enter min-h-[150px] md:min-h-0 h-full", visible[0] && "visible")}>
               <PriceCard
                 price={data.price}
                 spread={data.spread}
@@ -135,7 +135,7 @@ export default function Dashboard() {
                 priceHistory={data.priceHistory}
               />
             </div>
-            <div className={cn("stagger-enter h-full", visible[1] && "visible")}>
+            <div className={cn("stagger-enter min-h-[150px] md:min-h-0 h-full", visible[1] && "visible")}>
               <AccountCard
                 balance={data.balance}
                 equity={data.equity}
@@ -143,7 +143,7 @@ export default function Dashboard() {
                 equityHistory={data.equityHistory}
               />
             </div>
-            <div className={cn("stagger-enter h-full", visible[2] && "visible")}>
+            <div className={cn("stagger-enter min-h-[150px] md:min-h-0 h-full", visible[2] && "visible")}>
               <SessionCard
                 session={data.session}
                 isGoldenTime={data.isGoldenTime}
@@ -152,7 +152,7 @@ export default function Dashboard() {
                 timeFilter={data.timeFilter}
               />
             </div>
-            <div className={cn("stagger-enter h-full", visible[3] && "visible")}>
+            <div className={cn("stagger-enter min-h-[150px] md:min-h-0 h-full", visible[3] && "visible")}>
               <RiskCard
                 dailyLoss={data.dailyLoss}
                 dailyProfit={data.dailyProfit}
@@ -164,8 +164,8 @@ export default function Dashboard() {
           </div>
 
           {/* Row 2: AI Signals */}
-          <div className="flex-[1] min-h-0 grid grid-cols-5 gap-1.5">
-            <div className={cn("stagger-enter h-full", visible[4] && "visible")}>
+          <div className="grid grid-cols-2 gap-2 md:flex-[1] md:min-h-0 md:grid-cols-5 md:gap-1.5">
+            <div className={cn("stagger-enter min-h-[170px] md:min-h-0 h-full", visible[4] && "visible")}>
               <SignalCard
                 title="SMC Signal"
                 icon="smc"
@@ -175,7 +175,7 @@ export default function Dashboard() {
                 updatedAt={data.smc.updatedAt}
               />
             </div>
-            <div className={cn("stagger-enter h-full", visible[5] && "visible")}>
+            <div className={cn("stagger-enter min-h-[170px] md:min-h-0 h-full", visible[5] && "visible")}>
               <SignalCard
                 title="ML Prediction"
                 icon="ml"
@@ -188,7 +188,7 @@ export default function Dashboard() {
                 marketQuality={data.marketQuality}
               />
             </div>
-            <div className={cn("stagger-enter h-full", visible[6] && "visible")}>
+            <div className={cn("stagger-enter min-h-[170px] md:min-h-0 h-full", visible[6] && "visible")}>
               <RegimeCard
                 name={data.regime.name}
                 volatility={data.regime.volatility}
@@ -197,7 +197,7 @@ export default function Dashboard() {
                 h1Bias={data.h1Bias}
               />
             </div>
-            <div className={cn("stagger-enter h-full", visible[7] && "visible")}>
+            <div className={cn("stagger-enter min-h-[170px] md:min-h-0 h-full", visible[7] && "visible")}>
               <PerformanceCard
                 marketScore={data.marketScore}
                 marketQuality={data.marketQuality}
@@ -206,33 +206,33 @@ export default function Dashboard() {
                 riskMode={data.riskMode}
               />
             </div>
-            <div className={cn("stagger-enter h-full", visible[8] && "visible")}>
+            <div className={cn("stagger-enter min-h-[170px] md:min-h-0 h-full", visible[8] && "visible")}>
               <ModelCard />
             </div>
           </div>
 
           {/* Row 3: Charts */}
-          <div className="flex-[1.6] min-h-0 grid grid-cols-5 gap-1.5">
-            <div className={cn("stagger-enter col-span-3 min-h-0", visible[9] && "visible")}>
+          <div className="grid grid-cols-1 gap-2 md:flex-[1.6] md:min-h-0 md:grid md:grid-cols-5 md:gap-1.5">
+            <div className={cn("stagger-enter min-h-[300px] md:col-span-3 md:min-h-0", visible[9] && "visible")}>
               <PriceChart data={data.priceHistory} />
             </div>
-            <div className={cn("stagger-enter col-span-2 min-h-0", visible[10] && "visible")}>
+            <div className={cn("stagger-enter min-h-[240px] md:col-span-2 md:min-h-0", visible[10] && "visible")}>
               <AssistantCard data={data} />
             </div>
           </div>
 
           {/* Row 4: Trading + Log */}
-          <div className="flex-[1.2] min-h-0 grid grid-cols-4 gap-1.5">
-            <div className={cn("stagger-enter h-full", visible[11] && "visible")}>
+          <div className="grid grid-cols-2 gap-2 md:flex-[1.2] md:min-h-0 md:grid-cols-4 md:gap-1.5">
+            <div className={cn("stagger-enter min-h-[170px] md:min-h-0 h-full", visible[11] && "visible")}>
               <EntryFilterCard filters={data.entryFilters || []} />
             </div>
-            <div className={cn("stagger-enter h-full", visible[12] && "visible")}>
+            <div className={cn("stagger-enter min-h-[170px] md:min-h-0 h-full", visible[12] && "visible")}>
               <PositionsCard
                 positions={data.positions}
                 positionDetails={data.positionDetails}
               />
             </div>
-            <div className={cn("stagger-enter h-full", visible[13] && "visible")}>
+            <div className={cn("stagger-enter min-h-[170px] md:min-h-0 h-full", visible[13] && "visible")}>
               <BotStatusCard
                 riskMode={data.riskMode}
                 cooldown={data.cooldown}
@@ -242,7 +242,7 @@ export default function Dashboard() {
                 settings={data.settings}
               />
             </div>
-            <div className={cn("stagger-enter h-full", visible[14] && "visible")}>
+            <div className={cn("stagger-enter min-h-[170px] md:min-h-0 h-full", visible[14] && "visible")}>
               <LogCard logs={data.logs} />
             </div>
           </div>
