@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, Radio } from "lucide-react";
 
 interface PriceChartProps {
   data: number[];
@@ -19,32 +19,28 @@ function formatTime(date: Date): string {
 }
 
 export function PriceChart({ data }: PriceChartProps) {
+  const validData = useMemo(
+    () => data.filter((price) => Number.isFinite(price) && price > 0),
+    [data]
+  );
+
   const chartData = useMemo(() => {
-    if (data.length === 0) return [];
+    if (validData.length === 0) return [];
     const now = Date.now();
-    // Spread data points evenly over 2 hours (7200s)
     const totalMs = 2 * 60 * 60 * 1000;
-    const step = data.length > 1 ? totalMs / (data.length - 1) : 0;
+    const step = validData.length > 1 ? totalMs / (validData.length - 1) : 0;
 
-    return data.map((price, i) => {
+    return validData.map((price, i) => {
       const ts = new Date(now - totalMs + i * step);
-      return {
-        time: formatTime(ts),
-        timestamp: ts.getTime(),
-        price,
-      };
+      return { time: formatTime(ts), timestamp: ts.getTime(), price };
     });
-  }, [data]);
+  }, [validData]);
 
-  // Show ~6 evenly spaced tick labels on X axis
   const tickIndices = useMemo(() => {
     if (chartData.length <= 6) return chartData.map((d) => d.timestamp);
-    const step = Math.floor(chartData.length / 5);
+    const step = Math.max(1, Math.floor(chartData.length / 5));
     const ticks: number[] = [];
-    for (let i = 0; i < chartData.length; i += step) {
-      ticks.push(chartData[i].timestamp);
-    }
-    // Always include last
+    for (let i = 0; i < chartData.length; i += step) ticks.push(chartData[i].timestamp);
     if (ticks[ticks.length - 1] !== chartData[chartData.length - 1].timestamp) {
       ticks.push(chartData[chartData.length - 1].timestamp);
     }
@@ -52,24 +48,24 @@ export function PriceChart({ data }: PriceChartProps) {
   }, [chartData]);
 
   return (
-    <Card className="glass h-full overflow-hidden flex flex-col accent-top-blue">
-      <CardHeader>
-        <CardTitle className="text-sm font-medium text-apple-blue flex items-center gap-1.5 uppercase tracking-wider">
-          <TrendingUp className="h-4 w-4" />
+    <Card className="glass flex h-full min-h-[280px] min-w-0 flex-col overflow-hidden accent-top-blue">
+      <CardHeader className="shrink-0">
+        <CardTitle className="flex items-center gap-1.5 text-sm font-medium uppercase tracking-wider text-apple-blue">
+          <TrendingUp className="h-4 w-4 shrink-0" />
           Price Chart (2H)
-          {data.length > 0 && (
-            <span className="ml-auto text-base font-number text-apple-blue font-bold">
-              ${data[data.length - 1]?.toFixed(2)}
+          {validData.length > 0 && (
+            <span className="ml-auto text-base font-number font-bold text-apple-blue">
+              ${validData[validData.length - 1].toFixed(2)}
             </span>
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0 pb-1">
-        <div className="h-full w-full">
+      <CardContent className="min-h-0 min-w-0 flex-1 overflow-hidden pb-2">
+        <div className="h-full min-h-[210px] w-full min-w-0">
           {chartData.length > 1 ? (
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0, 0, 0, 0.06)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(128, 128, 128, 0.16)" />
                 <XAxis
                   dataKey="timestamp"
                   type="number"
@@ -77,7 +73,7 @@ export function PriceChart({ data }: PriceChartProps) {
                   ticks={tickIndices}
                   tickFormatter={(ts: number) => formatTime(new Date(ts))}
                   tick={{ fontSize: 11, fill: "#86868b", fontFamily: "var(--font-mono)" }}
-                  axisLine={{ stroke: "rgba(0,0,0,0.08)" }}
+                  axisLine={{ stroke: "rgba(128,128,128,0.2)" }}
                   tickLine={false}
                   interval="preserveStartEnd"
                 />
@@ -87,19 +83,17 @@ export function PriceChart({ data }: PriceChartProps) {
                   axisLine={false}
                   tickLine={false}
                   width={58}
-                  tickFormatter={(v: number) => v.toFixed(0)}
+                  tickFormatter={(v: number) => v.toFixed(2)}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "rgba(255, 255, 255, 0.85)",
-                    border: "1px solid rgba(0, 122, 255, 0.2)",
+                    backgroundColor: "rgba(24, 24, 27, 0.96)",
+                    border: "1px solid rgba(128, 128, 128, 0.25)",
                     borderRadius: "12px",
                     fontSize: "13px",
                     fontFamily: "var(--font-mono)",
-                    color: "#1d1d1f",
-                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
-                    backdropFilter: "blur(20px)",
-                    padding: "6px 10px",
+                    color: "#f4f4f5",
+                    padding: "8px 10px",
                   }}
                   labelFormatter={(ts: number) => formatTime(new Date(ts))}
                   formatter={(value: number) => [`$${value.toFixed(2)}`, "Price"]}
@@ -108,19 +102,26 @@ export function PriceChart({ data }: PriceChartProps) {
                 <defs>
                   <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#007AFF" stopOpacity={0.25} />
-                    <stop offset="40%" stopColor="#007AFF" stopOpacity={0.08} />
-                    <stop offset="100%" stopColor="#007AFF" stopOpacity={0} />
+                    <stop offset="100%" stopColor="#007AFF" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <Area type="monotone" dataKey="price" stroke="#007AFF" strokeWidth={2.5} fill="url(#priceGradient)" dot={false} isAnimationActive={false} />
+                <Area type="monotone" dataKey="price" stroke="#007AFF" strokeWidth={2} fill="url(#priceGradient)" dot={false} isAnimationActive={false} />
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-full flex items-center justify-center text-muted-foreground/50">
-              <div className="text-center space-y-1">
-                <TrendingUp className="h-6 w-6 mx-auto opacity-30" />
-                <p className="text-base">Collecting data...</p>
+            <div className="flex h-full min-h-[210px] flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/70 bg-black/10 px-5 text-center">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-muted/60 text-muted-foreground">
+                <Radio className="h-5 w-5" />
               </div>
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-foreground">Market data unavailable</p>
+                <p className="mx-auto max-w-xs text-xs leading-5 text-muted-foreground">
+                  The dashboard API is responding, but no verified XAUUSD price history has been received yet.
+                </p>
+              </div>
+              <span className="rounded-full border border-border px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                Waiting for data feed
+              </span>
             </div>
           )}
         </div>
